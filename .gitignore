@@ -1,4 +1,10 @@
-# Eclipse files
+# Eclipse Project Files
 bin/
 .classpath
 .project
+
+# NetBeans Project Files
+/nbproject/
+/lib/
+build.xml
+manifes.mf
