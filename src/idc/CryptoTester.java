@@ -1,6 +1,5 @@
 package idc;
 
-import java.io.Console;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.security.cert.Certificate;
@@ -10,8 +9,6 @@ import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
-
-import com.sun.xml.internal.ws.util.ByteArrayBuffer;
 
 import java.security.Key;
 import java.security.KeyPair;
@@ -98,11 +95,11 @@ public class CryptoTester {
 		cos.flush();
 				
 	    /*
-	     * Step 7. Digital Signature
+	     * TODO: Step 7. Digital Signature
 	     */
 		
 		/*
-		 * Step 8. Create the configuration file
+		 * TODO: Step 8. Create the configuration file
 		 *      a. Add the Digital Signature
 		 *      b. Add the Secret Key
 		 *      b. Add the IV (TODO: as Plaintext?) 
