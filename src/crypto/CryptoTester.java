@@ -1,4 +1,4 @@
-package idc;
+package crypto;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.cert.Certificate;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,6 +19,7 @@ import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import com.sun.xml.internal.org.jvnet.staxex.Base64EncoderStream;
 import com.sun.xml.internal.ws.util.ByteArrayBuffer;
@@ -38,8 +40,8 @@ public class CryptoTester {
 
 	public static void main(String[] args) throws Exception {
 		// Input parameters
-		String INPUT_FILE = "./tmp/document.txt";
-		String OUTPUT_FILE = INPUT_FILE + ".encrypted";
+		String INPUT_FILE = "./input/document.txt";
+		String OUTPUT_FILE = "./output/document.txt.encrypted";
 		String DEFAULT_KEYSTORE_LOCATION = "./keystores/";  
 		String KEYSTORE_NAME = "alice.jks";
 		String KEYSTORE_PASSWORD = "4l1c3=k3y5t0r3";
@@ -71,7 +73,8 @@ public class CryptoTester {
 		final int AES_KEYLENGTH = 128;	// change this as desired for the security level you want
 		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
 		keyGen.init(AES_KEYLENGTH);
-		SecretKey secretKey = keyGen.generateKey();
+//		SecretKey secretKey = keyGen.generateKey();
+		SecretKey secretKey = new SecretKeySpec("IDCHerzliya1983!".getBytes() ,"AES");
 		
 		/*
 		 * Step 2. Generate a random Initialization Vector (IV) 
@@ -125,13 +128,9 @@ public class CryptoTester {
 		byte[] secretKeyEncrypted = rsaCipher.doFinal(secretKey.getEncoded());
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append("Digital Signature: " + new BASE64Encoder().encode(digitalSignature));
+		sb.append("Digital Signature: " + Base64.getEncoder().encodeToString(digitalSignature));
 		sb.append(System.lineSeparator());
-		sb.append("Init Vector: " + new BASE64Encoder().encode(iv.getIV()));
-		sb.append(System.lineSeparator());
-//		sb.append("Secret Key (Encrypted): " + new BASE64Encoder().encode(secretKeyEncrypted));
-		String plaintextSecretKey = new String(secretKey.getEncoded(), StandardCharsets.UTF_16);
-		sb.append("Secret Key (Encrypted): " + plaintextSecretKey);
+		
 		sb.append(System.lineSeparator());
 		String text = sb.toString();
 		try {
@@ -139,8 +138,6 @@ public class CryptoTester {
 		} catch (FileAlreadyExistsException e) {
 			Logger.getLogger(CryptoTester.class.getName()).log(Level.SEVERE, null, e);
 		}
-//		AlgorithmParameters algParams = aesCipherForEncryption.getParameters();
-//		byte[] algParamsBytes = algParams.getEncoded();				
 		
 		
 		
