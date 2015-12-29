@@ -1,10 +1,20 @@
 package crypto;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -20,16 +30,19 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public class Crypto4J {
 
-    private static final Path INPUT_DIR_PATH = Paths.get("input/");
-    private static final Path OUTPUT_DIR_PATH = Paths.get("output/");
-    private static final Path KEYSTORES_DIR_PATH = Paths.get("keystores/");
+    private static final Logger LOGGER = Logger.getLogger(Crypto4J.class.getName());
+    private static final Map<String, File> defaultKeystoreFiles = new HashMap(2);
+    private static final String KEYSTORES_DIR = "keystores";
+    private static final String OUTPUT_DIR = "output";
+    private static final String INPUT_DIR = "input";
     
     /**
      * For the sake of simplicity, both keystores have the same password.
      */
     private static char[] keyStoresPassword;
+    private static FileInputStream fileInputStream;
+    private static FileOutputStream fileOutputStream;
     
-    private static final Logger logger = Logger.getLogger(Crypto4J.class.getName());
     
     public static byte[] encrypt() {
         throw new NotImplementedException();
@@ -62,13 +75,33 @@ public class Crypto4J {
     private static int writeFileSecure(File fileName, OutputStream OutputStream) {
         throw new NotImplementedException();
     }
+    
+    private static KeyStore loadKeyStore(String name) throws IllegalArgumentException,
+            NoSuchAlgorithmException, FileNotFoundException, KeyStoreException,
+            IOException, CertificateException {
+        
+        if (!name.matches("(alice|bob)")) {
+            throw new IllegalArgumentException("Arguments allowed are: 'alice' or 'bob'");
+        }
+        
+        KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+        File keyStoreFile = defaultKeystoreFiles.get(name);
+        fileInputStream = new FileInputStream(keyStoreFile);
+        keystore.load(fileInputStream, keyStoresPassword);
+        
+        return keystore;
+    }
         
     public static void main(String[] args) {
+        // Setup the default keystores that we'll be using
+        defaultKeystoreFiles.put("alice", Paths.get(KEYSTORES_DIR, "alice.jks").toFile());
+        defaultKeystoreFiles.put("bob", Paths.get(KEYSTORES_DIR, "bob.jks").toFile());
+                
         Options options = new Options();
         
         // Definition Stage
         boolean hasArg = true;
-        options.addOption("p", "keystorepass", hasArg, "The password used to protect the integrity of the keystore contents");
+        options.addOption("p", "password", hasArg, "The password used to protect the integrity of the keystore contents");
         options.addOption("h", "help", !hasArg, "This help message");
         
         // Automatically generate the Usage + Help message
@@ -80,22 +113,25 @@ public class Crypto4J {
             // Interrogation Stage
             CommandLine cmd = parser.parse(options, args);           
                         
-            // Display Help message if proper option was provided and exit
+            // Display Help message and exit
             if (cmd.hasOption("help")) {
-                formatter.printHelp("Crypto4J", options);
+                formatter.printHelp(Crypto4J.class.getName(), options);
                 System.exit(0);
             }            
             
-            if (cmd.hasOption("kstorepass")) {
-                String defaultValue = "k3y5t0r3";
-                keyStoresPassword = cmd.getOptionValue("kstorepass", defaultValue).toCharArray();
-                
-                
-            }
+            if (cmd.hasOption("password")) {
+                final String KS_DEFAULT_PASSWD = "k3y5t0r3";
+                keyStoresPassword = cmd.getOptionValue("password", KS_DEFAULT_PASSWD).toCharArray();
+                KeyStore aliceKeyStore = loadKeyStore("alice");
+                KeyStore bobKeyStore = loadKeyStore("bob");
+            }         
             
         } catch (ParseException ex) {
             System.err.println(ex.getLocalizedMessage());
-            formatter.printHelp("Crypto4J", options);
+            formatter.printHelp(Crypto4J.class.getName(), options);
+            System.exit(1);
+        } catch (IllegalArgumentException | KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException ex) {
+            Logger.getLogger(Crypto4J.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }       
         
