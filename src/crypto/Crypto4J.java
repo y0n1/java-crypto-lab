@@ -20,10 +20,14 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public class Crypto4J {
 
-    private static Path INPUT_DIR_PATH = Paths.get("input/");
-    private static Path OUTPUT_DIR_PATH = Paths.get("output/");
-    private static Path KEYSTORES_DIR_PATH = Paths.get("keystores/");
-    private static byte[] KS_PASSWORD_BYTES;
+    private static final Path INPUT_DIR_PATH = Paths.get("input/");
+    private static final Path OUTPUT_DIR_PATH = Paths.get("output/");
+    private static final Path KEYSTORES_DIR_PATH = Paths.get("keystores/");
+    
+    /**
+     * For the sake of simplicity, both keystores have the same password.
+     */
+    private static char[] keyStoresPassword;
     
     private static final Logger logger = Logger.getLogger(Crypto4J.class.getName());
     
@@ -84,7 +88,7 @@ public class Crypto4J {
             
             if (cmd.hasOption("kstorepass")) {
                 String defaultValue = "k3y5t0r3";
-                KS_PASSWORD_BYTES = cmd.getOptionValue("kstorepass", defaultValue).
+                keyStoresPassword = cmd.getOptionValue("kstorepass", defaultValue).toCharArray();
                 
                 
             }
