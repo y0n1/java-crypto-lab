@@ -7,4 +7,6 @@ bin/
 /nbproject/
 /lib/
 build.xml
-manifes.mf
+manifest.mf
+/build/
+
