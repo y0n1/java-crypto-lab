@@ -11,3 +11,4 @@ bin/
 /build/
 build.xml
 manifest.mf
+/output/
