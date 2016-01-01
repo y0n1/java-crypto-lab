@@ -1,5 +1,3 @@
-.gitignore
-
 # Eclipse Project Files
 bin/
 .classpath
@@ -12,3 +10,4 @@ bin/
 build.xml
 manifest.mf
 /output/
+/input/
